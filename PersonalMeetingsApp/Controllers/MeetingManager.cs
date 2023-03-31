@@ -25,7 +25,10 @@ namespace PersonalMeetingsApp.Controllers
             _meetings = new List<IMeeting>();
         }
 
-        public void AddMeeting(string ddMMyyyy, string hhMM, int duration, int notification = 15)
+
+
+        public void AddMeeting(string ddMMyyyy, string hhMM, 
+            int duration, int notification = 15)
         {
             DateTime dateTime;
 
@@ -40,6 +43,8 @@ namespace PersonalMeetingsApp.Controllers
                 MessagesHandler.Invoke(Messages.DateParseError);
             }
         }
+
+        
 
         void TryAddMeeting(IMeeting meeting)
         {
@@ -78,7 +83,8 @@ namespace PersonalMeetingsApp.Controllers
         {
             if (curMeeting.StartTime.Date == toCheckMeeting.StartTime.Date)
             {
-                if (curMeeting.StartTime > toCheckMeeting.EndTime || curMeeting.EndTime < toCheckMeeting.StartTime)
+                if (curMeeting.StartTime > toCheckMeeting.EndTime || 
+                    curMeeting.EndTime < toCheckMeeting.StartTime)
                 {
                     return true;
                 }
@@ -100,7 +106,18 @@ namespace PersonalMeetingsApp.Controllers
             return sb.ToString();
         }
 
+        public void ExportMeetings(string outFile)
+        {
+            if (File.Exists(outFile))
+            {
+                File.Delete(outFile);
+            }
 
+            using (StreamWriter sw = new StreamWriter(outFile))
+            {
+                sw.WriteLine(GetMeetingsString());
+            }
+        }
 
     }
 }
