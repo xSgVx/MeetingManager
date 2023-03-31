@@ -4,9 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,7 +26,6 @@ namespace PersonalMeetingsApp.Controllers
         {
             _meetings = new List<IMeeting>();
         }
-
 
 
         public void AddMeeting(string ddMMyyyy, string hhMM, 
@@ -106,18 +107,15 @@ namespace PersonalMeetingsApp.Controllers
             return sb.ToString();
         }
 
-        public void ExportMeetings(string outFile)
+        public void ExportMeetings(string outFile, bool rewriteFile)
         {
-            if (File.Exists(outFile))
-            {
-                File.Delete(outFile);
-            }
-
-            using (StreamWriter sw = new StreamWriter(outFile))
+            using (StreamWriter sw = new StreamWriter(outFile, !rewriteFile))
             {
                 sw.WriteLine(GetMeetingsString());
             }
         }
+
+
 
     }
 }

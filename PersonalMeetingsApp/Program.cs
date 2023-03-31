@@ -8,7 +8,7 @@ meetingManager.AddMeeting("12/05/2024","12:35",25);
 meetingManager.AddMeeting("12/05/2024","12:40",10);
 
 MessagesToConsole(meetingManager.GetMeetingsString());
-meetingManager.ExportMeetings("D:\\meetings.txt");
+meetingManager.ExportMeetings("D:\\meetings.txt", true);
 
 void MessagesToConsole(string message)
 {
