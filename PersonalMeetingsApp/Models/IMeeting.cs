@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PersonalMeetingsApp.Models
 {
@@ -11,5 +10,9 @@ namespace PersonalMeetingsApp.Models
     {
         public DateTime StartTime { get; }
         public DateTime EndTime { get; }
+        public double NotifyMinutes { get; }
+        public bool IsNotified { get; set; }
+
+        //public MeetingStatus MeetingStatus { get; set; } 
     }
 }
