@@ -1,4 +1,5 @@
-﻿using PersonalMeetingsApp.Utility;
+﻿using PersonalMeetingsApp.Extensions;
+using PersonalMeetingsApp.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -36,6 +37,14 @@ namespace PersonalMeetingsApp.Models
             this._endTime = meetingStart.AddMinutes(duration);
             this._notifyMinutes = notifyMinutes;
             this.MeetingStatus = MeetingStatus.Planed;
+        }
+
+        public Meeting(Meeting meetingToCopy)
+        {
+            this._startTime = meetingToCopy._startTime;
+            this._endTime = meetingToCopy._endTime;
+            this._notifyMinutes = meetingToCopy._notifyMinutes;
+            this.MeetingStatus = meetingToCopy.MeetingStatus;
         }
 
         //public Meeting(DateTime meetingStart, DateTime meetingEnd, double notifyMinutes)
@@ -77,7 +86,8 @@ namespace PersonalMeetingsApp.Models
 
         public override string ToString()
         {
-            return new string($"Дата встречи: {_startTime.ToString("dd:MM:yyyy")},{Environment.NewLine}" +
+            return new string($"Статус встречи: {MeetingStatus.GetDescription()}{Environment.NewLine}" +
+                              $"Дата встречи: {_startTime.ToString("dd:MM:yyyy")},{Environment.NewLine}" +
                               $"Время встречи: с {_startTime.ToString("HH:mm")} до {_endTime.ToString("HH:mm")}");
         }
     }

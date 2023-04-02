@@ -10,69 +10,93 @@ string stringResponce;
 
 while (true)
 {
-    while (true)
+    //while (true)
+    //{
+    ConsoleHelper.DisplayMessage(Messages.NextActionButton);
+    keyResponce = ConsoleHelper.GetConsoleResponceKey();
+
+    do
     {
-        ConsoleHelper.DisplayMessage(Messages.NextActionButton);
-        keyResponce = ConsoleHelper.GetConsoleResponceKey();
-
-        do
+        //add meeting
+        if (keyResponce.Key == ConsoleKey.D1 ||
+            keyResponce.Key == ConsoleKey.NumPad1)
         {
-            //add meeting
-            if (keyResponce.Key == ConsoleKey.A)
-            {
-                ConsoleHelper.DisplayMessage(Messages.EnterMeetingInfo);
-                meetingManager.AddMeeting(ConsoleHelper.GetConsoleResponceString());
-                break;
-            }
-
-            //edit meeting
-            if (keyResponce.Key == ConsoleKey.E)
-            {
-                break;
-            }
-
-            //remove meeting
-            if (keyResponce.Key == ConsoleKey.R)
-            {
-                break;
-            }
-
-            //show meetings
-            if (keyResponce.Key == ConsoleKey.S)
-            {
-                break;
-            }
-
-            //export meetings to file
-            if (keyResponce.Key == ConsoleKey.F)
-            {
-                break;
-            }
-
-
-        } while (Console.ReadKey(true).Key != ConsoleKey.Escape ||
-            Console.ReadKey(true).Key != ConsoleKey.Enter);
-
-
-        //close program
-        if (keyResponce.Key == ConsoleKey.Escape)
-        {
-            return;
+            ConsoleHelper.DisplayMessage(Messages.EnterMeetingInfo);
+            stringResponce = ConsoleHelper.GetConsoleResponceString();
+            meetingManager.AddMeeting(stringResponce);
+            break;
         }
-        else
+
+        //EDIT START TIME meeting
+        if (keyResponce.Key == ConsoleKey.D2 ||
+            keyResponce.Key == ConsoleKey.NumPad2)
         {
-            ConsoleHelper.DisplayMessage(Messages.InputError);
+            ConsoleHelper.DisplayMessage(Messages.EnterNewStartTime);
+            stringResponce = ConsoleHelper.GetConsoleResponceString();
+            meetingManager.EditStartTimeMeeting(stringResponce);
+            break;
         }
+
+        //EDIT END TIME meeting
+        if (keyResponce.Key == ConsoleKey.D3 ||
+            keyResponce.Key == ConsoleKey.NumPad3)
+        {
+            break;
+        }
+
+        //EDIT NOTIFICATION TIME meeting
+        if (keyResponce.Key == ConsoleKey.D4 ||
+            keyResponce.Key == ConsoleKey.NumPad4)
+        {
+            break;
+        }
+
+        //REMOVE meeting
+        if (keyResponce.Key == ConsoleKey.D5 ||
+            keyResponce.Key == ConsoleKey.NumPad5)
+        {
+            break;
+        }
+
+        //SHOW ALL meetings
+        if (keyResponce.Key == ConsoleKey.D6 ||
+            keyResponce.Key == ConsoleKey.NumPad6)
+        {
+            ConsoleHelper.DisplayMessage(meetingManager.GetMeetingsString());
+
+            break;
+        }
+
+        //SHOW DAY meetings
+        if (keyResponce.Key == ConsoleKey.D7 ||
+            keyResponce.Key == ConsoleKey.NumPad7)
+        {
+            break;
+        }
+
+        //EXPORT meetings
+        if (keyResponce.Key == ConsoleKey.D8 ||
+            keyResponce.Key == ConsoleKey.NumPad8)
+        {
+            break;
+        }
+
+
+    } while (Console.ReadKey(true).Key != ConsoleKey.Escape ||
+        Console.ReadKey(true).Key != ConsoleKey.Enter);
+
+    /*
+    //close program
+    if (keyResponce.Key == ConsoleKey.Escape)
+    {
+        return;
     }
+    else
+    {
+        ConsoleHelper.DisplayMessage(Messages.InputError);
+    }
+    */
 
-
-    //meetingManager.AddMeeting("01/04/2023", "14:30", 25);
-    //meetingManager.AddMeeting("12/05/2005", "11:00", 25);
-    //meetingManager.AddMeeting("12/05/2024", "12:35", 25);
-    //meetingManager.AddMeeting("12/05/2024", "12:40", 10);
-
-    //MessagesToConsole(meetingManager.GetMeetingsString());
-    //meetingManager.ExportMeetings("D:\\meetings.txt", true);
 
 
 
