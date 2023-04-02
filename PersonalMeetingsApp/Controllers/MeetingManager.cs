@@ -29,8 +29,6 @@ namespace PersonalMeetingsApp.Controllers
         Remove,
     }
 
-
-
     internal class MeetingManager
     {
         public IList<IMeeting> Meetings => _meetings;
@@ -53,12 +51,15 @@ namespace PersonalMeetingsApp.Controllers
         {
             try
             {
-                var parsedData = TryGetDataFromMeetingString(s, Crud.Add);
+                (DateTime, int, int) parsedData = TryGetDataFromMeetingString(s, Crud.Add);
 
                 var meeting = new Meeting(parsedData.Item1, parsedData.Item2,
                     parsedData.Item3);
 
                 TryAddMeeting(meeting);
+
+                MessagesHandler?.Invoke(Messages.AddMeetingSuccess + Environment.NewLine +
+                    meeting.ToString(), MessageStatus.Success);
             }
             catch (Exception e)
             {
@@ -72,7 +73,7 @@ namespace PersonalMeetingsApp.Controllers
         {
             try
             {
-                var newStartData = TryGetDataFromMeetingString(s, Crud.Edit);
+                (DateTime, int) newStartData = TryGetDataFromMeetingString(s, Crud.Edit);
                 var oldMeeting = (Meeting)_meetings.ElementAt(newStartData.Item2);
                 Meeting editedMeeting = new Meeting(oldMeeting);
                 editedMeeting.EditStartTime(newStartData.Item1);
@@ -90,26 +91,6 @@ namespace PersonalMeetingsApp.Controllers
             }
         }
 
-        private (DateTime, int) TryParseNewTimeString(string s)
-        {
-            DateTime newTime;
-            int id;
-
-            var arrS = s.Trim().Split(' ');
-
-            if (arrS.Length == 2)
-            {
-                if (DateTime.TryParse(arrS[1] + " " + arrS[2], out newTime) &&
-                    newTime > DateTime.Today &&
-                    int.TryParse(arrS[0], out id))
-                {
-                    return new(newTime, id);
-                }
-            }
-
-            throw new Exception(Messages.InputError);
-        }
-
         public void RemoveMeeting(int id)
         {
             var toRemoveMeeting = _meetings.ElementAt(id);
@@ -118,8 +99,6 @@ namespace PersonalMeetingsApp.Controllers
             MessagesHandler?.Invoke(Messages.MeetingRemindInfo + Environment.NewLine +
                 toRemoveMeeting.ToString(), MessageStatus.Info);
         }
-
-
 
         private dynamic TryGetDataFromMeetingString(string s, Crud crud)
         {
@@ -233,9 +212,6 @@ namespace PersonalMeetingsApp.Controllers
             if (!_meetings.Any() || !HasIntersections(meeting))
             {
                 _meetings.Add(meeting);
-                MessagesHandler?.Invoke(Messages.AddMeetingSuccess + Environment.NewLine +
-                    meeting.ToString(), MessageStatus.Success);
-
                 return true;
             }
             else
