@@ -12,7 +12,9 @@ namespace PersonalMeetingsApp.Models
         public DateTime EndTime { get; }
         public double NotifyMinutes { get; }
         public bool IsNotified { get; set; }
-
-        //public MeetingStatus MeetingStatus { get; set; } 
+        public MeetingStatus MeetingStatus { get; set; }
+        public void EditStartTime(DateTime newStartTime);
+        public void EditEndTime(DateTime newEndTime);
+        public void EditNotifyTime(double notifyMinutes);
     }
 }
