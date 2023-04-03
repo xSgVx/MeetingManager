@@ -25,10 +25,12 @@ namespace PersonalMeetingsApp.Utility
         internal const string DataParseError = "Error: error while parsing input data";
 
         internal const string AddMeetingSuccess = "Success: meeting has been added";
-        internal const string EditMeetingSuccess = "Success: meeting has been changed";
+        internal const string EditMeetingSuccess = "Success: meeting time has been changed";
+        internal const string EditMeetingNotifySuccess = "Success: meeting notify time has been changed";
+        internal const string RemoveMeetingSuccess = "Success: meeting has been changed";
 
         internal const string MeetingRemindInfo = "Info: next meeting soon, be ready!";
-        internal const string MeetingRemovedInfo = "Info: meeting has beed removed!";
+
 
         internal const string NextActionButton = "\n---------------------------------------------\n" +
             "Press \"1\" to ADD new meeting,\n" +
@@ -49,7 +51,7 @@ namespace PersonalMeetingsApp.Utility
             "at format:\n" +
             "dd/MM/yyyy hh:MM MM MM or\n" +
             "dd/MM/yyyy hh:MM MM\n" +
-            "For example: 01/01/2001 12:21 30 15 , where 30 minutes is duration,\n" +
+            "For example: 01/01/2001 12:21 30 15 , where 30 is duration (in minutes),\n" +
             "15 minutes will be notification time" +
             "\n---------------------------------------------\n";
 
@@ -57,7 +59,29 @@ namespace PersonalMeetingsApp.Utility
             "\nEnter new start time of chosen meeting\n" +
             "at format:\n" +
             "dd/MM/yyyy hh:MM meetingId\n" +
-            "For example: 01/01/2001 12:21 5\n" +
+            "For example: 01/01/2001 12:21 5, where 12:21 is new start time, 5 is meetingId\n" +
+            "(To know meetingID u can SHOW ALL or SHOW DAY meetings)\n" +
+            "\n---------------------------------------------\n";
+
+        internal const string EnterNewEndTime = $"\n---------------------------------------------\n" +
+            "\nEnter new end time of chosen meeting\n" +
+            "at format:\n" +
+            "dd/MM/yyyy hh:MM meetingId\n" +
+            "For example: 01/01/2001 12:21 5, where 12:21 is new end time, 5 is meetingId\n" +
+            "(To know meetingID u can SHOW ALL or SHOW DAY meetings)\n" +
+            "\n---------------------------------------------\n";
+
+        internal const string EnterNotifyTimeMeetingID = $"\n---------------------------------------------\n" +
+            "\nEnter new notify time and meeting id to remove\n" +
+            "at format:\n" +
+            "MM meetingId\n" +
+            "For example: 10 1 , where 10 is new notify time, 1 is meetingId\n" +
+
+            "(To know meetingID u can SHOW ALL or SHOW DAY meetings)\n" +
+            "\n---------------------------------------------\n";
+
+        internal const string EnterMeetingIDToRemove = $"\n---------------------------------------------\n" +
+            "\nEnter meeting id to remove\n" +
             "(To know meetingID u can SHOW ALL or SHOW DAY meetings)\n" +
             "\n---------------------------------------------\n";
 

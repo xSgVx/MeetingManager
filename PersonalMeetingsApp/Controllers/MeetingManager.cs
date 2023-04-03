@@ -15,20 +15,6 @@ using System.Threading.Tasks;
 
 namespace PersonalMeetingsApp.Controllers
 {
-    enum ParseOptions
-    {
-        Date_Time_Duration_Notification,
-        Date_Time_Duration,
-        Date_Time_Id,
-    }
-
-    enum Crud
-    {
-        Add,
-        Edit,
-        Remove,
-    }
-
     internal class MeetingManager
     {
         public IList<IMeeting> Meetings => _meetings;
@@ -51,15 +37,21 @@ namespace PersonalMeetingsApp.Controllers
         {
             try
             {
-                (DateTime, int, int) parsedData = TryGetDataFromMeetingString(s, Crud.Add);
+                (DateTime, int, int) parsedData = TryGetDataFromMeetingString(s, Operation.Add);
 
                 var meeting = new Meeting(parsedData.Item1, parsedData.Item2,
                     parsedData.Item3);
 
-                TryAddMeeting(meeting);
-
-                MessagesHandler?.Invoke(Messages.AddMeetingSuccess + Environment.NewLine +
-                    meeting.ToString(), MessageStatus.Success);
+                if (TryAddMeeting(meeting))
+                {
+                    MessagesHandler?.Invoke(Messages.AddMeetingSuccess + Environment.NewLine +
+                        meeting.ToString(), MessageStatus.Success);
+                }
+                else
+                {
+                    MessagesHandler?.Invoke(Messages.IntersectionError,
+                        MessageStatus.Error);
+                }
             }
             catch (Exception e)
             {
@@ -68,21 +60,48 @@ namespace PersonalMeetingsApp.Controllers
             }
         }
 
-        //NOTE ДООФОРМИТЬ
         public void EditStartTimeMeeting(string s)
+        {
+            EditTimeMeeting(s, Operation.EditStart);
+        }
+
+        public void EditEndTimeMeeting(string s)
+        {
+            EditTimeMeeting(s, Operation.EditEnd);
+        }
+
+        private void EditTimeMeeting(string s, Operation operation)
         {
             try
             {
-                (DateTime, int) newStartData = TryGetDataFromMeetingString(s, Crud.Edit);
-                var oldMeeting = (Meeting)_meetings.ElementAt(newStartData.Item2);
+                (DateTime, int) newDateTime = TryGetDataFromMeetingString(s, operation);
+                var oldMeeting = _meetings.ElementAt(newDateTime.Item2);
                 Meeting editedMeeting = new Meeting(oldMeeting);
-                editedMeeting.EditStartTime(newStartData.Item1);
+
+                if (operation == Operation.EditStart)
+                {
+                    editedMeeting.EditStartTime(newDateTime.Item1);
+                }
+
+                if (operation == Operation.EditEnd)
+                {
+                    editedMeeting.EditEndTime(newDateTime.Item1);
+                }
 
                 _meetings.Remove(oldMeeting);
-                TryAddMeeting(editedMeeting);
 
-                MessagesHandler?.Invoke(Messages.EditMeetingSuccess + Environment.NewLine +
-                    editedMeeting.ToString(), MessageStatus.Info);
+                if (TryAddMeeting(editedMeeting))   //нет пересечений
+                {
+                    MessagesHandler?.Invoke(Messages.EditMeetingSuccess + Environment.NewLine +
+                        editedMeeting.ToString(), MessageStatus.Success);
+                }
+                else    //есть пересечения, возвращаем старое 
+                {
+                    MessagesHandler?.Invoke(Messages.IntersectionError,
+                        MessageStatus.Error);
+
+                    _meetings.Add(oldMeeting);
+                }
             }
             catch (Exception e)
             {
@@ -91,36 +110,69 @@ namespace PersonalMeetingsApp.Controllers
             }
         }
 
-        public void RemoveMeeting(int id)
+        public void EditNotificationTimeMeeting(string s)
         {
-            var toRemoveMeeting = _meetings.ElementAt(id);
-            _meetings.Remove(toRemoveMeeting);
+            try
+            {
+                var arrS = s.Trim().Split(' ').Select(int.Parse).ToArray();
+                var toEditMeeting = _meetings.ElementAt(arrS[1]);
+                toEditMeeting.EditNotifyTime(arrS[0]);
 
-            MessagesHandler?.Invoke(Messages.MeetingRemindInfo + Environment.NewLine +
-                toRemoveMeeting.ToString(), MessageStatus.Info);
+                MessagesHandler?.Invoke(Messages.EditMeetingNotifySuccess + Environment.NewLine +
+                    toEditMeeting.ToString(), MessageStatus.Info);
+            }
+            catch
+            {
+                MessagesHandler?.Invoke(Messages.DataParseError, MessageStatus.Error);
+            }
         }
 
-        private dynamic TryGetDataFromMeetingString(string s, Crud crud)
+        public void RemoveMeeting(string s)
+        {
+            try
+            {
+                var meetId = int.Parse(s.Trim());
+                var toRemoveMeeting = _meetings.ElementAt(meetId);
+                _meetings.Remove(toRemoveMeeting);
+
+                MessagesHandler?.Invoke(Messages.RemoveMeetingSuccess + Environment.NewLine +
+                    toRemoveMeeting.ToString(), MessageStatus.Info);
+            }
+            catch
+            {
+                MessagesHandler?.Invoke(Messages.DataParseError, MessageStatus.Error);
+            }
+        }
+
+        private dynamic TryGetDataFromMeetingString(string s, Operation operation)
         {
             var arrS = s.Trim().Split(' ');
 
-            if (arrS.Length == 4)   //date, startTime, duration, notification
+            if (arrS.Length == 4 &&
+                operation == Operation.Add)   //date, startTime, duration, notification
             {
                 return TryGetDataTuple(arrS, ParseOptions.Date_Time_Duration_Notification);
             }
 
             if (arrS.Length == 3)
             {
-                if (crud == Crud.Add)   //date, startTime, duration
+                if (operation == Operation.Add)   //date, startTime, duration
                 {
                     return TryGetDataTuple(arrS, ParseOptions.Date_Time_Duration);
                 }
 
-                if (crud == Crud.Edit)  //date, startTime, meetId
+                if (operation == Operation.EditStart ||
+                    operation == Operation.EditEnd)  //date, startTime or endTime, meetId
                 {
                     return TryGetDataTuple(arrS, ParseOptions.Date_Time_Id);
                 }
             }
+
+            if (arrS.Length == 2)   //duration, meetId
+            {
+                return TryGetDataTuple(arrS, ParseOptions.Date_Time_Duration_Notification);
+            }
+
 
             throw new Exception(Messages.InputError);
         }
@@ -144,6 +196,7 @@ namespace PersonalMeetingsApp.Controllers
                         {
                             return (dateTime, duration, notification);
                         }
+
                         break;
                     }
                 case ParseOptions.Date_Time_Duration:
@@ -152,6 +205,7 @@ namespace PersonalMeetingsApp.Controllers
                         {
                             return (dateTime, duration, 15);
                         }
+
                         break;
                     }
                 case ParseOptions.Date_Time_Id:
@@ -160,6 +214,7 @@ namespace PersonalMeetingsApp.Controllers
                         {
                             return (dateTime, id);
                         }
+
                         break;
                     }
             }
@@ -206,7 +261,6 @@ namespace PersonalMeetingsApp.Controllers
             }
         }
 
-
         private bool TryAddMeeting(IMeeting meeting)
         {
             if (!_meetings.Any() || !HasIntersections(meeting))
@@ -214,10 +268,8 @@ namespace PersonalMeetingsApp.Controllers
                 _meetings.Add(meeting);
                 return true;
             }
-            else
-            {
-                throw new Exception(Messages.IntersectionError);
-            }
+
+            return false;
         }
 
         private bool HasIntersections(IMeeting newMeeting)
@@ -241,7 +293,12 @@ namespace PersonalMeetingsApp.Controllers
             return false;
         }
 
-        public string GetMeetingsString()
+        public void ShowMeetings()
+        {
+
+        }
+
+        private string GetAllMeetingsString()
         {
             var sb = new StringBuilder();
 
@@ -258,11 +315,28 @@ namespace PersonalMeetingsApp.Controllers
         {
             using (StreamWriter sw = new StreamWriter(outFile, !rewriteFile))
             {
-                sw.WriteLine(GetMeetingsString());
+                sw.WriteLine(GetAllMeetingsString());
             }
         }
 
 
 
+    }
+
+    internal enum ParseOptions
+    {
+        Date_Time_Duration_Notification,
+        Date_Time_Duration,
+        Date_Time_Id,
+    }
+
+    internal enum Operation
+    {
+        Add,
+        EditStart,
+        EditEnd,
+        EditNotify,
+        Show,
+        Remove,
     }
 }
