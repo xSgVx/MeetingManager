@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PersonalMeetingsApp.Utility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,8 +14,9 @@ namespace PersonalMeetingsApp.Models
         public double NotifyMinutes { get; }
         public bool IsNotified { get; set; }
         public MeetingStatus MeetingStatus { get; set; }
-        public void EditStartTime(DateTime newStartTime);
-        public void EditEndTime(DateTime newEndTime);
+        public bool TryEditStartTime(DateTime newStartTime);
+        public bool TryEditEndTime(DateTime newEndTime);
         public void EditNotifyTime(double notifyMinutes);
+
     }
 }

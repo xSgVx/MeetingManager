@@ -1,5 +1,4 @@
-﻿using NeoSmart.AsyncLock;
-using PersonalMeetingsApp.Controllers;
+﻿using PersonalMeetingsApp.Controllers;
 using PersonalMeetingsApp.Utility;
 
 object _locker = new();

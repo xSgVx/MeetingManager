@@ -11,12 +11,6 @@ using System.Threading.Tasks;
 
 namespace PersonalMeetingsApp.Models
 {
-    internal enum MeetingStatus
-    {
-        [Description("Запланировано")] Planed,
-        [Description("Завершено")] Ended
-    }
-
     internal class Meeting : IMeeting
     {
         public DateTime StartTime => _startTime;
@@ -43,31 +37,29 @@ namespace PersonalMeetingsApp.Models
             this._notifyMinutes = meetingToCopy.NotifyMinutes;
         }
 
-        public void EditStartTime(DateTime newStartTime)
+        public bool TryEditStartTime(DateTime newStartTime)
         {
-            if (MeetingStatus == MeetingStatus.Ended)
-                throw new Exception(Messages.MeetingEndedError);
-
-            if (newStartTime > _endTime)
-                throw new Exception(Messages.ErrorOnEditStartTime);
+            if (MeetingStatus == MeetingStatus.Ended ||
+                newStartTime > _endTime)
+                return false;
 
             _startTime = newStartTime;
+            return true;
         }
 
-        public void EditEndTime(DateTime newEndTime)
+        public bool TryEditEndTime(DateTime newEndTime)
         {
-            if (MeetingStatus == MeetingStatus.Ended)
-                throw new Exception(Messages.MeetingEndedError);
+            if (MeetingStatus == MeetingStatus.Ended ||
+                newEndTime < _startTime)
+                return false;
 
-            if (newEndTime < _startTime)
-                throw new Exception(Messages.ErrorOnEditEndTime);
-        
-            _endTime = newEndTime;
+            this._endTime = newEndTime;
+            return true;
         }
 
         public void EditNotifyTime(double notifyMinutes)
         {
-            _notifyMinutes = notifyMinutes;
+            this._notifyMinutes = notifyMinutes;
         }
 
         public override string ToString()
@@ -86,7 +78,7 @@ namespace PersonalMeetingsApp.Models
                 return 1;
 
             if (this?.StartTime == other?.StartTime)
-                throw new Exception();
+                return 0;
 
             return 0;
         }

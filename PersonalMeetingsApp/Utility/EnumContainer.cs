@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,5 +35,11 @@ namespace PersonalMeetingsApp.Utility
         Error,
         Success,
         Default
+    }
+
+    internal enum MeetingStatus
+    {
+        [Description("Запланировано")] Planed,
+        [Description("Завершено")] Ended
     }
 }
