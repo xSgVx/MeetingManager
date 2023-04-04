@@ -53,22 +53,20 @@ namespace PersonalMeetingsApp.Models
 
         public void EditStartTime(DateTime newStartTime)
         {
+            if (MeetingStatus == MeetingStatus.Ended)
+                throw new Exception(Messages.MeetingEndedError);
+
             if (newStartTime > _endTime)
                 throw new Exception(Messages.ErrorOnEditStartTime);
 
             _startTime = newStartTime;
         }
 
-        //public void EditEndTime(double durationMinutes)
-        //{
-        //    if (durationMinutes < 0)
-        //        throw new Exception(Messages.ErrorOnEditEndTime);
-        //
-        //    _endTime = _startTime.AddMinutes(durationMinutes);
-        //}
-
         public void EditEndTime(DateTime newEndTime)
         {
+            if (MeetingStatus == MeetingStatus.Ended)
+                throw new Exception(Messages.MeetingEndedError);
+
             if (newEndTime < _startTime)
                 throw new Exception(Messages.ErrorOnEditEndTime);
         
@@ -83,8 +81,22 @@ namespace PersonalMeetingsApp.Models
         public override string ToString()
         {
             return new string($"Статус встречи: {MeetingStatus.GetDescription()}{Environment.NewLine}" +
-                              $"Дата встречи: {_startTime.ToString("dd:MM:yyyy")},{Environment.NewLine}" +
-                              $"Время встречи: с {_startTime.ToString("HH:mm")} до {_endTime.ToString("HH:mm")}");
+                              $"Дата встречи: {_startTime:dd:MM:yyyy},{Environment.NewLine}" +
+                              $"Время встречи: с {_startTime:HH:mm} до {_endTime:HH:mm}");
+        }
+
+        public int CompareTo(IMeeting? other)
+        {
+            if (this?.StartTime < other?.StartTime)
+                return -1;
+
+            if (this?.StartTime > other?.StartTime)
+                return 1;
+
+            if (this?.StartTime == other?.StartTime)
+                throw new Exception();
+
+            return 0;
         }
     }
 }

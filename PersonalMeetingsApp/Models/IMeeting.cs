@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PersonalMeetingsApp.Models
 {
-    internal interface IMeeting
+    internal interface IMeeting: IComparable<IMeeting>
     {
         public DateTime StartTime { get; }
         public DateTime EndTime { get; }

@@ -3,6 +3,7 @@ using PersonalMeetingsApp.Models;
 using PersonalMeetingsApp.Utility;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -19,7 +20,10 @@ namespace PersonalMeetingsApp.Controllers
     internal class MeetingManager
     {
         public IList<IMeeting> Meetings => _meetings;
-        private IList<IMeeting> _meetings;
+        private readonly List<IMeeting> _meetings = null!;
+
+        //public ObservableCollection<IMeeting> Meetings => _meetings;
+        //private ObservableCollection<IMeeting> _meetings;
 
         public delegate void MessageHandler(string message, MessageStatus messageStatus);
         public event MessageHandler? MessagesHandler;
@@ -29,6 +33,7 @@ namespace PersonalMeetingsApp.Controllers
 
         public MeetingManager()
         {
+
             _meetings = new List<IMeeting>();
 
             Task.Run(MeetingNotifier);
@@ -48,6 +53,8 @@ namespace PersonalMeetingsApp.Controllers
                 {
                     MessagesHandler?.Invoke(Messages.AddMeetingSuccess + Environment.NewLine +
                         meeting.ToString(), MessageStatus.Success);
+
+                    _meetings.Sort();
                 }
                 else
                 {
@@ -78,7 +85,7 @@ namespace PersonalMeetingsApp.Controllers
             {
                 (DateTime, int) newDateTime_Id = TryGetDataFromString(s, editTimeOperation);
                 var oldMeeting = _meetings.ElementAt(newDateTime_Id.Item2);
-                Meeting editedMeeting = new Meeting(oldMeeting);
+                Meeting editedMeeting = new(oldMeeting);
 
                 if (editTimeOperation == Operation.EditStart)
                 {
@@ -96,6 +103,8 @@ namespace PersonalMeetingsApp.Controllers
                 {
                     MessagesHandler?.Invoke(Messages.EditMeetingSuccess + Environment.NewLine +
                         editedMeeting.ToString(), MessageStatus.Success);
+
+                    _meetings.Sort();
                 }
                 else    //есть пересечения, возвращаем старое 
                 {
@@ -117,8 +126,8 @@ namespace PersonalMeetingsApp.Controllers
             try
             {
                 (int, int) notifyTime_Id = TryGetDataFromString(s, Operation.EditNotify);
-                var toEditMeeting = _meetings.ElementAt(notifytime_Id.Item2);
-                toEditMeeting.EditNotifyTime(notifytime_Id.Item1);
+                var toEditMeeting = _meetings.ElementAt(notifyTime_Id.Item2);
+                toEditMeeting.EditNotifyTime(notifyTime_Id.Item1);
 
                 MessagesHandler?.Invoke(Messages.EditMeetingNotifySuccess + Environment.NewLine +
                     toEditMeeting.ToString(), MessageStatus.Info);
@@ -171,7 +180,7 @@ namespace PersonalMeetingsApp.Controllers
             {
                 (DateOnly, string) datePathTuple = TryGetDataFromString(s, Operation.Export);
 
-                using (StreamWriter sw = new StreamWriter(datePathTuple.Item2, append))
+                using (StreamWriter sw = new(datePathTuple.Item2, append))
                 {
                     sw.WriteLine(GetMeetingsString(datePathTuple.Item1));
                 }
@@ -180,7 +189,7 @@ namespace PersonalMeetingsApp.Controllers
             }
             catch (Exception e)
             {
-                MessagesHandler?.Invoke(Messages.MeetingsExportError, MessageStatus.Error);
+                MessagesHandler?.Invoke(Messages.MeetingsExportError + e.Message, MessageStatus.Error);
             }
         }
 
@@ -232,16 +241,14 @@ namespace PersonalMeetingsApp.Controllers
                     }
                     break;
                 case Operation.Export:
-                    if (arrS.Length >= 2)  //
+                    if (arrS.Length >= 2)  //dateonly, path
                     {
                         return TryGetDataTuple(arrS, ParseOptions.DateOnly_Path);
                     }
                     break;
-                default:
-                    break;
             }
 
-            throw new Exception();
+            throw new Exception(Messages.InputError);
         }
 
         private dynamic TryGetDataTuple(string[] dataArr, ParseOptions parseOptions)
@@ -253,8 +260,7 @@ namespace PersonalMeetingsApp.Controllers
             {
                 case ParseOptions.DateTime_Duration_Notification:
                     {
-                        if (DateTime.TryParse(dataArr[0] + " " + dataArr[1], out dateTime) &&
-                            dateTime > DateTime.Now &&
+                        if (TryParseDate(dataArr[0] + " " + dataArr[1], out dateTime) &&
                             int.TryParse(dataArr[2], out duration) &&
                             int.TryParse(dataArr[3], out notification))
                         {
@@ -265,8 +271,7 @@ namespace PersonalMeetingsApp.Controllers
                     }
                 case ParseOptions.DateTime_Duration:
                     {
-                        if (DateTime.TryParse(dataArr[0] + " " + dataArr[1], out dateTime) &&
-                            dateTime > DateTime.Now &&
+                        if (TryParseDate(dataArr[0] + " " + dataArr[1], out dateTime) &&
                             int.TryParse(dataArr[2], out duration))
                         {
                             return (dateTime, duration, 15);
@@ -276,7 +281,7 @@ namespace PersonalMeetingsApp.Controllers
                     }
                 case ParseOptions.DateTime_MeetingId:
                     {
-                        if (DateTime.TryParse(dataArr[0] + " " + dataArr[1], out dateTime) &&
+                        if (TryParseDate(dataArr[0] + " " + dataArr[1], out dateTime) &&
                            int.TryParse(dataArr[2], out id))
                         {
                             return (dateTime, id);
@@ -296,8 +301,7 @@ namespace PersonalMeetingsApp.Controllers
                     }
                 case ParseOptions.DateOnly:
                     {
-                        DateOnly dateOnly;
-                        if (DateOnly.TryParse(dataArr[0], out dateOnly))
+                        if (DateOnly.TryParse(dataArr[0], out DateOnly dateOnly))
                         {
                             return dateOnly;
                         }
@@ -315,8 +319,7 @@ namespace PersonalMeetingsApp.Controllers
                     }
                 case ParseOptions.DateOnly_Path:
                     {
-                        DateOnly dateOnly;
-                        if (DateOnly.TryParse(dataArr[0], out dateOnly))
+                        if (DateOnly.TryParse(dataArr[0], out DateOnly dateOnly))
                         {
                             string path = string.Join("", dataArr.Skip(1));
                             if (!string.IsNullOrEmpty(Path.GetDirectoryName(path)))
@@ -332,48 +335,59 @@ namespace PersonalMeetingsApp.Controllers
             throw new Exception(Messages.DataParseError);
         }
 
+        private bool TryParseDate(string stringDateTime, out DateTime dateTime)
+        {
+            if (DateTime.TryParse(stringDateTime, out dateTime) && dateTime > DateTime.Now)
+            {
+                return true;
+            }
+            else
+            {
+                throw new Exception(Messages.EnteredDateError);
+            }
+
+            throw new Exception(Messages.DataParseError);
+        }
 
         //так же как вариант можно реализовать через events
         //thread-safe с библиотекой NeoSmart.AsyncLock
-        private AsyncLock _locker = new AsyncLock();
+        private readonly AsyncLock _locker = new();
         private async Task MeetingNotifier()
         {
             while (true)
             {
                 using (_locker.Lock())
                 {
-                    if (_meetings.Any())
+                    if (_meetings != null && _meetings.Any())
                     {
                         var allToNotifyMeetings = _meetings?.Where(m => m.IsNotified == false &&
                                                                   (DateTime.Now.Day == m.StartTime.Day) &&
-                                                                  ((DateTime.Now - m.StartTime).Minutes - m.NotifyMinutes) <= 0);
+                                                                  ((m.StartTime - DateTime.Now).Minutes < m.NotifyMinutes));
 
                         if (allToNotifyMeetings?.Count() > 0)
                         {
                             foreach (var meet in allToNotifyMeetings)
                             {
                                 MessagesHandler?.Invoke(Messages.MeetingRemindInfo + Environment.NewLine +
-                                    meet.ToString(), MessageStatus.Info);
+                                    meet.ToString() + Messages.EmptySpace, MessageStatus.Info);
 
                                 meet.IsNotified = true;
                             }
                         }
                     }
                 }
-
-                Thread.Sleep(1000);    //every 1 min checking for notify
             }
         }
 
         //thread-safe с библиотекой NeoSmart.AsyncLock
-        private AsyncLock _locker2 = new AsyncLock();
+        private readonly AsyncLock _locker2 = new();
         private async Task StatusUpdater()
         {
             while (true)
             {
                 using (_locker2.Lock())
                 {
-                    if (_meetings.Any())
+                    if (_meetings != null && _meetings.Any())
                     {
                         var meetingsWithOldStatus = _meetings?.Where(m => (DateTime.Now > m.EndTime) &&
                                                                     (m.MeetingStatus != MeetingStatus.Ended));
@@ -387,8 +401,6 @@ namespace PersonalMeetingsApp.Controllers
                         }
                     }
                 }
-
-                //Thread.Sleep(60000);    //every 1 min checking for notify
             }
         }
 
@@ -428,7 +440,7 @@ namespace PersonalMeetingsApp.Controllers
         {
             if (!_meetings.Any() ||
                 (date != null &&
-                _meetings.Any(m => m.StartTime.Day == date.Value.Day)))
+                !_meetings.Any(m => m.StartTime.Day == date.Value.Day)))
             {
                 return Messages.NoMeetings;
             }

@@ -17,22 +17,22 @@ namespace PersonalMeetingsApp.Utility
 
     internal static class Messages
     {
-        internal const string IntersectionError = "Error: meeting has intersection with other meetings";
-        internal const string DateParseError = "Error: input date was not correct";
-        internal const string ErrorOnEditEndTime = "Error: uncorrect time of meeting end";
-        internal const string ErrorOnEditStartTime = "Error: uncorrect time of meeting start";
-        internal const string InputError = "Error: input error";
-        internal const string DataParseError = "Error: error while parsing input data";
-        internal const string EnteredDateError = "Error: entered date is not correct";
-        internal const string MeetingsExportError = $"Error: export path not correct";
+        internal const string IntersectionError = "\nError: meeting has intersection with other meetings\n";
+        internal const string ErrorOnEditEndTime = "\nError: uncorrect time of meeting end\n";
+        internal const string ErrorOnEditStartTime = "\nError: uncorrect time of meeting start\n";
+        internal const string InputError = "\nError: input error is not correct\n";
+        internal const string DataParseError = "\nError: error while parsing input data\n";
+        internal const string EnteredDateError = "\nError: entered date is not correct\n";
+        internal const string MeetingsExportError = "\nError: export path not correct\n";
+        internal const string MeetingEndedError = "\nError: meeting ended, cant change time\n";
 
-        internal const string AddMeetingSuccess = "Success: meeting has been added";
-        internal const string EditMeetingSuccess = "Success: meeting time has been changed";
-        internal const string EditMeetingNotifySuccess = "Success: meeting notify time has been changed";
-        internal const string RemoveMeetingSuccess = "Success: meeting has been deleted";
-        internal const string MeetingsExported = $"Success: meetings has been exported";
+        internal const string AddMeetingSuccess = "\nSuccess: meeting has been added\n";
+        internal const string EditMeetingSuccess = "\nSuccess: meeting time has been changed\n";
+        internal const string EditMeetingNotifySuccess = "\nSuccess: meeting notify time has been changed\n";
+        internal const string RemoveMeetingSuccess = "\nSuccess: meeting has been deleted\n";
+        internal const string MeetingsExported = "\nSuccess: meetings has been exported\n";
 
-        internal const string MeetingRemindInfo = "Info: next meeting soon, be ready!";
+        internal const string MeetingRemindInfo = "\nInfo: next meeting soon, be ready!\n";
 
         internal const string NextActionButton = "\n---------------------------------------------\n" +
             "Press \"1\" to ADD new meeting,\n" +
@@ -94,8 +94,8 @@ namespace PersonalMeetingsApp.Utility
             "\n---------------------------------------------\n";
 
         internal const string EnterPathToFile = $"\n---------------------------------------------\n" +
-            "\nEnter path to export meetings\n" +
-            """For example: D:\\meetings.txt\""" + "\n" +
+            "\nEnter date and path to export meetings\n" +
+            """For example: 10/10/2023 D:\\meetings.txt\""" + "\n" +
             "\n---------------------------------------------\n";
 
         internal const string EmptySpace = "\n\n---------------------------------------------\n";

@@ -1,5 +1,8 @@
-﻿using PersonalMeetingsApp.Controllers;
+﻿using NeoSmart.AsyncLock;
+using PersonalMeetingsApp.Controllers;
 using PersonalMeetingsApp.Utility;
+
+AsyncLock _locker = new();
 
 var meetingManager = new MeetingManager();
 meetingManager.MessagesHandler += DisplayMessage;
@@ -98,26 +101,30 @@ while (true)
 
 void DisplayMessage(string message, MessageStatus messageStatus = MessageStatus.Default)
 {
-    switch (messageStatus)
+    using (_locker.Lock())
     {
-        case MessageStatus.Info:
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine(message);
-            break;
-        case MessageStatus.Error:
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(message);
-            break;
-        case MessageStatus.Success:
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(message);
-            break;
-        default:
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine(message);
-            break;
-    }
+        switch (messageStatus)
+        {
+            case MessageStatus.Info:
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine(message);
+                break;
+            case MessageStatus.Error:
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(message);
+                break;
+            case MessageStatus.Success:
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(message);
+                break;
+            default:
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine(message);
+                break;
+        }
 
+        Console.ForegroundColor = ConsoleColor.White;
+    }
 }
 
 
