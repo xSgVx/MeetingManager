@@ -2,7 +2,7 @@
 using PersonalMeetingsApp.Controllers;
 using PersonalMeetingsApp.Utility;
 
-AsyncLock _locker = new();
+object _locker = new();
 
 var meetingManager = new MeetingManager();
 meetingManager.MessagesHandler += DisplayMessage;
@@ -101,7 +101,7 @@ while (true)
 
 void DisplayMessage(string message, MessageStatus messageStatus = MessageStatus.Default)
 {
-    using (_locker.Lock())
+    lock(_locker)
     {
         switch (messageStatus)
         {

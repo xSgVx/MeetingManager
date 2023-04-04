@@ -1,19 +1,6 @@
-﻿using NeoSmart.AsyncLock;
-using PersonalMeetingsApp.Models;
+﻿using PersonalMeetingsApp.Models;
 using PersonalMeetingsApp.Utility;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PersonalMeetingsApp.Controllers
 {
@@ -22,18 +9,13 @@ namespace PersonalMeetingsApp.Controllers
         public IList<IMeeting> Meetings => _meetings;
         private readonly List<IMeeting> _meetings = null!;
 
-        //public ObservableCollection<IMeeting> Meetings => _meetings;
-        //private ObservableCollection<IMeeting> _meetings;
-
         public delegate void MessageHandler(string message, MessageStatus messageStatus);
         public event MessageHandler? MessagesHandler;
 
-        //public delegate void MeetingNotify(MeetingStatus meetingStatus);
-        //public event MeetingNotify? MeetingsNotifier;
+        private const int defaultNotifTime = 15;
 
         public MeetingManager()
         {
-
             _meetings = new List<IMeeting>();
 
             Task.Run(MeetingNotifier);
@@ -44,10 +26,10 @@ namespace PersonalMeetingsApp.Controllers
         {
             try
             {
-                (DateTime, int, int) parsedData = TryGetDataFromString(s, Operation.Add);
+                (DateTime date, int duration, int notif) parsedData = TryGetDataFromString(s, Operation.Add);
 
-                var meeting = new Meeting(parsedData.Item1, parsedData.Item2,
-                    parsedData.Item3);
+                var meeting = new Meeting(parsedData.date, parsedData.duration,
+                    parsedData.notif);
 
                 if (TryAddMeeting(meeting))
                 {
@@ -69,32 +51,26 @@ namespace PersonalMeetingsApp.Controllers
             }
         }
 
-        public void EditStartTimeMeeting(string s)
-        {
-            EditTimeMeeting(s, Operation.EditStart);
-        }
+        public void EditStartTimeMeeting(string s) => EditTimeMeeting(s, Operation.EditStart);
 
-        public void EditEndTimeMeeting(string s)
-        {
-            EditTimeMeeting(s, Operation.EditEnd);
-        }
+        public void EditEndTimeMeeting(string s) => EditTimeMeeting(s, Operation.EditEnd);
 
         private void EditTimeMeeting(string s, Operation editTimeOperation)
         {
             try
             {
-                (DateTime, int) newDateTime_Id = TryGetDataFromString(s, editTimeOperation);
-                var oldMeeting = _meetings.ElementAt(newDateTime_Id.Item2);
+                (DateTime date, int meetId) newDateTime_Id = TryGetDataFromString(s, editTimeOperation);
+                var oldMeeting = _meetings.ElementAt(newDateTime_Id.meetId);
                 Meeting editedMeeting = new(oldMeeting);
 
                 if (editTimeOperation == Operation.EditStart)
                 {
-                    editedMeeting.EditStartTime(newDateTime_Id.Item1);
+                    editedMeeting.EditStartTime(newDateTime_Id.date);
                 }
 
                 if (editTimeOperation == Operation.EditEnd)
                 {
-                    editedMeeting.EditEndTime(newDateTime_Id.Item1);
+                    editedMeeting.EditEndTime(newDateTime_Id.date);
                 }
 
                 _meetings.Remove(oldMeeting);
@@ -178,11 +154,11 @@ namespace PersonalMeetingsApp.Controllers
         {
             try
             {
-                (DateOnly, string) datePathTuple = TryGetDataFromString(s, Operation.Export);
+                (DateOnly date, string path) datePath = TryGetDataFromString(s, Operation.Export);
 
-                using (StreamWriter sw = new(datePathTuple.Item2, append))
+                using (StreamWriter sw = new(datePath.path, append))
                 {
-                    sw.WriteLine(GetMeetingsString(datePathTuple.Item1));
+                    sw.WriteLine(GetMeetingsString(datePath.date));
                 }
 
                 MessagesHandler?.Invoke(Messages.MeetingsExported, MessageStatus.Success);
@@ -195,7 +171,7 @@ namespace PersonalMeetingsApp.Controllers
 
         private dynamic TryGetDataFromString(string s, Operation operation)
         {
-            var arrS = s.Trim().Split(' ');
+            var arrS = s.Trim().Split(' '); //проверка массива на правильность входных данных
 
             switch (operation)
             {
@@ -274,7 +250,7 @@ namespace PersonalMeetingsApp.Controllers
                         if (TryParseDate(dataArr[0] + " " + dataArr[1], out dateTime) &&
                             int.TryParse(dataArr[2], out duration))
                         {
-                            return (dateTime, duration, 15);
+                            return (dateTime, duration, defaultNotifTime);
                         }
 
                         break;
@@ -349,14 +325,12 @@ namespace PersonalMeetingsApp.Controllers
             throw new Exception(Messages.DataParseError);
         }
 
-        //так же как вариант можно реализовать через events
-        //thread-safe с библиотекой NeoSmart.AsyncLock
-        private readonly AsyncLock _locker = new();
-        private async Task MeetingNotifier()
+        private readonly object _locker = new();
+        private Task MeetingNotifier()
         {
             while (true)
             {
-                using (_locker.Lock())
+                lock (_locker)
                 {
                     if (_meetings != null && _meetings.Any())
                     {
@@ -376,16 +350,17 @@ namespace PersonalMeetingsApp.Controllers
                         }
                     }
                 }
+
+                Thread.Sleep(1000);     //1 sec
             }
         }
 
-        //thread-safe с библиотекой NeoSmart.AsyncLock
-        private readonly AsyncLock _locker2 = new();
-        private async Task StatusUpdater()
+        private readonly object _locker2 = new();
+        private Task StatusUpdater()
         {
             while (true)
             {
-                using (_locker2.Lock())
+                lock(_locker2)
                 {
                     if (_meetings != null && _meetings.Any())
                     {
@@ -401,6 +376,8 @@ namespace PersonalMeetingsApp.Controllers
                         }
                     }
                 }
+                
+                Thread.Sleep(1000);     //1 sec
             }
         }
 
@@ -467,27 +444,5 @@ namespace PersonalMeetingsApp.Controllers
 
             return sb.ToString();
         }
-    }
-
-    internal enum ParseOptions
-    {
-        DateTime_Duration_Notification,
-        DateTime_Duration,
-        DateTime_MeetingId,
-        Notify_MeetingId,
-        DateOnly,
-        MeetingId,
-        DateOnly_Path
-    }
-
-    internal enum Operation
-    {
-        Add,
-        EditStart,
-        EditEnd,
-        EditNotify,
-        Show,
-        Remove,
-        Export
     }
 }

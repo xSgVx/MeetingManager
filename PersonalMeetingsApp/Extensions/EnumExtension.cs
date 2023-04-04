@@ -13,7 +13,7 @@ namespace PersonalMeetingsApp.Extensions
         public static string GetDescription(this Enum enumElement)
         {
             Type type = enumElement.GetType();
-
+                                                                
             MemberInfo[] memInfo = type.GetMember(enumElement.ToString());
             if (memInfo != null && memInfo.Length > 0)
             {

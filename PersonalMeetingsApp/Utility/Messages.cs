@@ -7,14 +7,6 @@ using System.Threading.Tasks;
 
 namespace PersonalMeetingsApp.Utility
 {
-    internal enum MessageStatus
-    {
-        Info,
-        Error,
-        Success,
-        Default
-    }
-
     internal static class Messages
     {
         internal const string IntersectionError = "\nError: meeting has intersection with other meetings\n";

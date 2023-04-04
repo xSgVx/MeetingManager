@@ -43,14 +43,6 @@ namespace PersonalMeetingsApp.Models
             this._notifyMinutes = meetingToCopy.NotifyMinutes;
         }
 
-        //public Meeting(DateTime meetingStart, DateTime meetingEnd, double notifyMinutes)
-        //{
-        //    this._startTime = meetingStart;
-        //    this._endTime = meetingEnd;
-        //    this._notifyMinutes = notifyMinutes;
-        //    this.MeetingStatus = MeetingStatus.Planed;
-        //}
-
         public void EditStartTime(DateTime newStartTime)
         {
             if (MeetingStatus == MeetingStatus.Ended)
