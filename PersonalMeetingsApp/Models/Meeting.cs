@@ -22,29 +22,25 @@ namespace PersonalMeetingsApp.Models
         public DateTime StartTime => _startTime;
         public DateTime EndTime => _endTime;
         public double NotifyMinutes => _notifyMinutes;
-        public MeetingStatus MeetingStatus { get; set; }
-        //public MeetingStatus MeetingStatus { get _status; }
+        public MeetingStatus MeetingStatus { get; set; } = MeetingStatus.Planed;
         public bool IsNotified { get; set; } = false;
 
         private DateTime _startTime;
         private DateTime _endTime;
         private double _notifyMinutes;
-        //private MeetingStatus _status;
 
         public Meeting(DateTime meetingStart, double duration, double notifyMinutes)
         {
             this._startTime = meetingStart;
             this._endTime = meetingStart.AddMinutes(duration);
             this._notifyMinutes = notifyMinutes;
-            this.MeetingStatus = MeetingStatus.Planed;
         }
 
-        public Meeting(Meeting meetingToCopy)
+        public Meeting(IMeeting meetingToCopy)
         {
-            this._startTime = meetingToCopy._startTime;
-            this._endTime = meetingToCopy._endTime;
-            this._notifyMinutes = meetingToCopy._notifyMinutes;
-            this.MeetingStatus = meetingToCopy.MeetingStatus;
+            this._startTime = meetingToCopy.StartTime;
+            this._endTime = meetingToCopy.EndTime;
+            this._notifyMinutes = meetingToCopy.NotifyMinutes;
         }
 
         //public Meeting(DateTime meetingStart, DateTime meetingEnd, double notifyMinutes)
@@ -63,21 +59,21 @@ namespace PersonalMeetingsApp.Models
             _startTime = newStartTime;
         }
 
-        public void EditEndTime(double durationMinutes)
-        {
-            if (durationMinutes < 0)
-                throw new Exception(Messages.ErrorOnEditEndTime);
-
-            _endTime = _startTime.AddMinutes(durationMinutes);
-        }
-
-        //public void EditEndTime(DateTime newEndTime)
+        //public void EditEndTime(double durationMinutes)
         //{
-        //    if (newEndTime < _startTime)
+        //    if (durationMinutes < 0)
         //        throw new Exception(Messages.ErrorOnEditEndTime);
         //
-        //    _endTime = newEndTime;
+        //    _endTime = _startTime.AddMinutes(durationMinutes);
         //}
+
+        public void EditEndTime(DateTime newEndTime)
+        {
+            if (newEndTime < _startTime)
+                throw new Exception(Messages.ErrorOnEditEndTime);
+        
+            _endTime = newEndTime;
+        }
 
         public void EditNotifyTime(double notifyMinutes)
         {

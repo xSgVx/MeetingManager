@@ -1,29 +1,22 @@
 ﻿using PersonalMeetingsApp.Controllers;
 using PersonalMeetingsApp.Utility;
 
-MeetingManager meetingManager = new MeetingManager();
-meetingManager.MessagesHandler += ConsoleHelper.DisplayMessage;
-ConsoleKeyInfo keyResponce;
-string stringResponce;
-
-
+var meetingManager = new MeetingManager();
+meetingManager.MessagesHandler += DisplayMessage;
 
 while (true)
 {
-    //while (true)
-    //{
-    ConsoleHelper.DisplayMessage(Messages.NextActionButton);
-    keyResponce = ConsoleHelper.GetConsoleResponceKey();
+    DisplayMessage(Messages.NextActionButton);
+    var keyResponce = Console.ReadKey();
 
-    do
+    while (true)
     {
         //add meeting
         if (keyResponce.Key == ConsoleKey.D1 ||
             keyResponce.Key == ConsoleKey.NumPad1)
         {
-            ConsoleHelper.DisplayMessage(Messages.EnterMeetingInfo);
-            stringResponce = ConsoleHelper.GetConsoleResponceString();
-            meetingManager.AddMeeting(stringResponce);
+            DisplayMessage(Messages.EnterNewMeetingInfo);
+            meetingManager.AddMeeting(Console.ReadLine());
             break;
         }
 
@@ -31,9 +24,8 @@ while (true)
         if (keyResponce.Key == ConsoleKey.D2 ||
             keyResponce.Key == ConsoleKey.NumPad2)
         {
-            ConsoleHelper.DisplayMessage(Messages.EnterNewStartTime);
-            stringResponce = ConsoleHelper.GetConsoleResponceString();
-            meetingManager.EditStartTimeMeeting(stringResponce);
+            DisplayMessage(Messages.EnterNewStartTime);
+            meetingManager.EditStartTimeMeeting(Console.ReadLine());
             break;
         }
 
@@ -41,6 +33,8 @@ while (true)
         if (keyResponce.Key == ConsoleKey.D3 ||
             keyResponce.Key == ConsoleKey.NumPad3)
         {
+            DisplayMessage(Messages.EnterNewEndTime);
+            meetingManager.EditEndTimeMeeting(Console.ReadLine());
             break;
         }
 
@@ -48,6 +42,8 @@ while (true)
         if (keyResponce.Key == ConsoleKey.D4 ||
             keyResponce.Key == ConsoleKey.NumPad4)
         {
+            DisplayMessage(Messages.EnterNotifyTimeMeetingID);
+            meetingManager.EditNotificationTimeMeeting(Console.ReadLine());
             break;
         }
 
@@ -55,6 +51,8 @@ while (true)
         if (keyResponce.Key == ConsoleKey.D5 ||
             keyResponce.Key == ConsoleKey.NumPad5)
         {
+            DisplayMessage(Messages.EnterMeetingIDToRemove);
+            meetingManager.RemoveMeeting(Console.ReadLine());
             break;
         }
 
@@ -62,8 +60,8 @@ while (true)
         if (keyResponce.Key == ConsoleKey.D6 ||
             keyResponce.Key == ConsoleKey.NumPad6)
         {
-            ConsoleHelper.DisplayMessage(meetingManager.GetMeetingsString());
-
+            DisplayMessage(Messages.EmptySpace);
+            meetingManager.ShowAllMeetings();
             break;
         }
 
@@ -71,6 +69,8 @@ while (true)
         if (keyResponce.Key == ConsoleKey.D7 ||
             keyResponce.Key == ConsoleKey.NumPad7)
         {
+            DisplayMessage(Messages.EnterDatetime);
+            meetingManager.ShowDayMeetings(Console.ReadLine());
             break;
         }
 
@@ -78,31 +78,46 @@ while (true)
         if (keyResponce.Key == ConsoleKey.D8 ||
             keyResponce.Key == ConsoleKey.NumPad8)
         {
+            DisplayMessage(Messages.EnterPathToFile);
+            meetingManager.ExportMeetings(Console.ReadLine());
             break;
         }
 
-
-    } while (Console.ReadKey(true).Key != ConsoleKey.Escape ||
-        Console.ReadKey(true).Key != ConsoleKey.Enter);
-
-    /*
-    //close program
-    if (keyResponce.Key == ConsoleKey.Escape)
-    {
-        return;
+        //close program
+        if (keyResponce.Key == ConsoleKey.Escape)
+        {
+            return;
+        }
+        else
+        {
+            DisplayMessage(Messages.InputError);
+            break;
+        }
     }
-    else
+}
+
+void DisplayMessage(string message, MessageStatus messageStatus = MessageStatus.Default)
+{
+    switch (messageStatus)
     {
-        ConsoleHelper.DisplayMessage(Messages.InputError);
+        case MessageStatus.Info:
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine(message);
+            break;
+        case MessageStatus.Error:
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            break;
+        case MessageStatus.Success:
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(message);
+            break;
+        default:
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(message);
+            break;
     }
-    */
 
-
-
-
-
-
-    //Thread.Sleep(1000);
 }
 
 

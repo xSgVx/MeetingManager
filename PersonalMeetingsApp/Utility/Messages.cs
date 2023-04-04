@@ -23,14 +23,16 @@ namespace PersonalMeetingsApp.Utility
         internal const string ErrorOnEditStartTime = "Error: uncorrect time of meeting start";
         internal const string InputError = "Error: input error";
         internal const string DataParseError = "Error: error while parsing input data";
+        internal const string EnteredDateError = "Error: entered date is not correct";
+        internal const string MeetingsExportError = $"Error: export path not correct";
 
         internal const string AddMeetingSuccess = "Success: meeting has been added";
         internal const string EditMeetingSuccess = "Success: meeting time has been changed";
         internal const string EditMeetingNotifySuccess = "Success: meeting notify time has been changed";
-        internal const string RemoveMeetingSuccess = "Success: meeting has been changed";
+        internal const string RemoveMeetingSuccess = "Success: meeting has been deleted";
+        internal const string MeetingsExported = $"Success: meetings has been exported";
 
         internal const string MeetingRemindInfo = "Info: next meeting soon, be ready!";
-
 
         internal const string NextActionButton = "\n---------------------------------------------\n" +
             "Press \"1\" to ADD new meeting,\n" +
@@ -44,7 +46,7 @@ namespace PersonalMeetingsApp.Utility
             "Press \"ESC\" to close program" +
             "\n---------------------------------------------\n";
 
-        internal const string EnterMeetingInfo = "\n---------------------------------------------\n" +
+        internal const string EnterNewMeetingInfo = "\n---------------------------------------------\n" +
             "\nEnter meeting info: day, time, " +
             "meeting duration (in minutes),\n" +
             "notification time (is optional, default time is 15 minutes)\n" +
@@ -76,7 +78,6 @@ namespace PersonalMeetingsApp.Utility
             "at format:\n" +
             "MM meetingId\n" +
             "For example: 10 1 , where 10 is new notify time, 1 is meetingId\n" +
-
             "(To know meetingID u can SHOW ALL or SHOW DAY meetings)\n" +
             "\n---------------------------------------------\n";
 
@@ -85,8 +86,22 @@ namespace PersonalMeetingsApp.Utility
             "(To know meetingID u can SHOW ALL or SHOW DAY meetings)\n" +
             "\n---------------------------------------------\n";
 
-        internal const string EditMeetingInfo = "Enter the number of meeting thats needs to change " +
-            "or press \"ESC\" to exit edit menu";
+        internal const string EnterDatetime = $"\n---------------------------------------------\n" +
+            "\nEnter datetime to show meetings of that day\n" +
+            "at format:\n" +
+            "dd/MM/yyyy\n"+
+            "For example: 01/01/2001\n" +
+            "\n---------------------------------------------\n";
+
+        internal const string EnterPathToFile = $"\n---------------------------------------------\n" +
+            "\nEnter path to export meetings\n" +
+            """For example: D:\\meetings.txt\""" + "\n" +
+            "\n---------------------------------------------\n";
+
+        internal const string EmptySpace = "\n\n---------------------------------------------\n";
+
+        internal const string NoMeetings = "\n---------------------------------------------\n" +
+            "No meetings";
 
 
     }
