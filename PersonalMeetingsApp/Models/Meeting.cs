@@ -1,4 +1,5 @@
 ﻿using PersonalMeetingsApp.Extensions;
+using PersonalMeetingsApp.Models.Interfaces;
 using PersonalMeetingsApp.Utility;
 using System;
 using System.Collections.Generic;

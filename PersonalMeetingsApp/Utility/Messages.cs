@@ -12,7 +12,7 @@ namespace PersonalMeetingsApp.Utility
         internal const string IntersectionError = "\nError: meeting has intersection with other meetings\n";
         internal const string ErrorOnEditEndTime = "\nError: uncorrect time of meeting end\n";
         internal const string ErrorOnEditStartTime = "\nError: uncorrect time of meeting start\n";
-        internal const string InputError = "\nError: input error is not correct\n";
+        internal const string InputError = "\nError: input is not correct\n";
         internal const string DataParseError = "\nError: error while parsing input data\n";
         internal const string EnteredDateError = "\nError: entered date is not correct\n";
         internal const string MeetingsExportError = "\nError: export path not correct\n";
@@ -23,6 +23,10 @@ namespace PersonalMeetingsApp.Utility
         internal const string EditMeetingNotifySuccess = "\nSuccess: meeting notify time has been changed\n";
         internal const string RemoveMeetingSuccess = "\nSuccess: meeting has been deleted\n";
         internal const string MeetingsExported = "\nSuccess: meetings has been exported\n";
+
+        //internal const string Success = "\n---------------------------------------------\n" +
+        //    "Success" +
+        //    "\n---------------------------------------------\n";
 
         internal const string MeetingRemindInfo = "\nInfo: next meeting soon, be ready!\n";
 
@@ -95,6 +99,33 @@ namespace PersonalMeetingsApp.Utility
         internal const string NoMeetings = "\n---------------------------------------------\n" +
             "No meetings";
 
+        private static object _locker = new();
+        public static void DisplayMessage(string message, MessageStatus messageStatus = MessageStatus.Default)
+        {
+            lock (_locker)
+            {
+                switch (messageStatus)
+                {
+                    case MessageStatus.Info:
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(message);
+                        break;
+                    case MessageStatus.Error:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(message);
+                        break;
+                    case MessageStatus.Success:
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine(message);
+                        break;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine(message);
+                        break;
+                }
 
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+        }
     }
 }

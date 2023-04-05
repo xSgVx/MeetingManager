@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PersonalMeetingsApp.Models
+namespace PersonalMeetingsApp.Models.Interfaces
 {
-    internal interface IMeeting: IComparable<IMeeting>
+    internal interface IMeeting : IComparable<IMeeting>
     {
         public DateTime StartTime { get; }
         public DateTime EndTime { get; }
